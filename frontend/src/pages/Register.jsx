@@ -8,6 +8,7 @@ function Register() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [agree, setAgree] = useState(false);
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] =
@@ -28,7 +29,7 @@ function Register() {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/register",
+  `${API_URL}/api/register`,
         {
           fullname,
           email,

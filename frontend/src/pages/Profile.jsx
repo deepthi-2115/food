@@ -19,19 +19,21 @@ function Profile() {
   ] = useState(false);
  const [fullname, setFullname] = useState("");
 const [editProfile, setEditProfile] = useState(false);
+   const API_URL = import.meta.env.VITE_API_URL;
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const token = localStorage.getItem("token");
 
-        const response = await fetch(
-          "http://localhost:5000/api/profile",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+
+const response = await fetch(
+  `${API_URL}/api/profile`,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
 
         const data = await response.json();
 setUser(data);
@@ -59,7 +61,7 @@ setFullname(data.fullname || "");
       const token = localStorage.getItem("token");
 
       const response = await fetch(
-        "http://localhost:5000/api/change-password",
+        `${API_URL}/api/change-password`,
         {
           method: "PUT",
           headers: {
@@ -92,19 +94,19 @@ setFullname(data.fullname || "");
   try {
     const token = localStorage.getItem("token");
 
-    const response = await fetch(
-      "http://localhost:5000/api/update-profile",
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          fullname,
-        }),
-      }
-    );
+   const response = await fetch(
+  `${API_URL}/api/update-profile`,
+  {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      fullname,
+    }),
+  }
+);
 
     const data = await response.json();
 if (response.ok) {

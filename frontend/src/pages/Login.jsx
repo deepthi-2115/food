@@ -1,91 +1,190 @@
-import {useState} from "react";
-import {Link} from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import {useNavigate} from "react-router-dom";
-function Login(){
-    const[email,setEmail]=useState("");
-    const[password,setPassword]=useState("");
-    const navigate=useNavigate();
-    const handleLogin = async (e) => {
+
+function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  const navigate = useNavigate();
+
+  const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
-        const loginData = {
-            email,
-            password,
-        };
+      const response = await axios.post(
+        "http://localhost:5000/api/login",
+        { email, password }
+      );
 
-        const response = await axios.post(
-            "http://localhost:5000/api/login",
-            loginData
-        );
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem(
+        "user",
+        JSON.stringify(response.data.user)
+      );
 
-        localStorage.setItem("token", response.data.token);
-
-        localStorage.setItem(
-            "user",
-            JSON.stringify(response.data.user)
-        );
-
-        alert(response.data.message);
-
-        navigate("/home");
-
+      alert(response.data.message);
+      navigate("/home");
     } catch (error) {
-        console.log(error.response?.data);
-
-        alert(
-            error.response?.data?.message ||
-            "Login Failed"
-        );
+      alert(
+        error.response?.data?.message ||
+          "Login Failed"
+      );
     }
-};
-    return(
-        <div className="container bg-light mt-5 p-2 rounded"
-        style={{height:"85vh", overflow:"hidden"}}>
-            <div className="row" style={{height:"85vh", overflow:"hidden"}}>
-                <div className="col-md-6"style={{height:"100vh", overflow:"hidden"}}>
-                   <img className="img-fluid position-relative w-100 h-75" src="src/assets/Login.png"></img>
-                </div>
-                <div className="col-md-6 p-3 my-3">
-                    <h2 className="fw-bold">Login Here</h2><br/>
-                    <p className="text-secondary">Login to your account to continue</p>
-                    <form onSubmit={handleLogin}>
-                        <div className="mb-3">
-                        <label className="form-label">Email</label><br/>
-                        <input className="form-control" type="email" value={email} onChange={(e)=>setEmail(e.target.value)}/>
-                        </div>
+  };
 
-                        <div className="mb-3">
-                        <label className="form-label">Password</label><br/>
-                        <input className="form-control" type="password" 
-                            value={password} onChange={(e)=>setPassword(e.target.value)}/>
-                        </div>
-                        <div className="row">
-                            <div className="col-md-6">
-                                <div className="form-check">
-                                    <input className="form-check-input" type="checkbox" id="check2"></input>
-                                    <label className="form-check-label">Remember me</label>
-                                </div>
-                            </div>
-                            <div className="col-md-6">
-                                <p className="text-primary text-end">Forget Password?</p>
-                            </div>
-                        </div>
-                        <button type="submit" className="btn btn-primary text-white w-100">Login</button>
- <div className="d-flex text-align-center my-4">
-                            <hr className="flex-grow-1"></hr>
-                            <span className="text-muted mx-3">or</span>
-                            <hr className="flex-grow-1"></hr>
-                        </div>
-                        <button type="submit" className="btn btn-outline-dark w-100">Login with Google</button>
-                        <p className="text-center text-muted mt-3">Don't have an account?<Link to="/register">Register</Link></p>
-                       
+  return (
+    <div
+      className="container-fluid d-flex align-items-center justify-content-center"
+      style={{
+        minHeight: "100vh",
+        backgroundColor: "#f8f9fa",
+      }}
+    >
+      <div
+        className="card shadow border-0 w-100"
+        style={{ maxWidth: "1000px" }}
+      >
+        <div className="row g-0">
+          
+     
+          <div className="col-lg-6 d-none d-lg-flex align-items-center justify-content-center bg-light">
+            <img
+              src="src/assets/Login.png"
+              alt="Login"
+              className="img-fluid p-4"
+              style={{ maxHeight: "650px" }}
+            />
+          </div>
 
-                    </form>
+ 
+          <div className="col-lg-6 col-12">
+            <div className="p-4 p-md-5">
+              <h2 className="fw-bold mb-2">
+                Welcome Back
+              </h2>
+
+              <p className="text-muted mb-4">
+                Login to continue
+              </p>
+
+              <form onSubmit={handleLogin}>
+                <div className="mb-3">
+                  <label className="form-label">
+                    Email
+                  </label>
+
+                  <input
+                    type="email"
+                    className="form-control"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) =>
+                      setEmail(e.target.value)
+                    }
+                    required
+                  />
                 </div>
+
+                <div className="mb-3">
+                  <label className="form-label">
+                    Password
+                  </label>
+
+                  <div className="input-group">
+                    <input
+                      type={
+                        showPassword
+                          ? "text"
+                          : "password"
+                      }
+                      className="form-control"
+                      placeholder="Enter password"
+                      value={password}
+                      onChange={(e) =>
+                        setPassword(
+                          e.target.value
+                        )
+                      }
+                      required
+                    />
+
+                    <button
+                      type="button"
+                      className="btn btn-outline-secondary"
+                      onClick={() =>
+                        setShowPassword(
+                          !showPassword
+                        )
+                      }
+                    >
+                      {showPassword
+                        ? "Hide"
+                        : "Show"}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="d-flex justify-content-between align-items-center mb-4">
+                  <div className="form-check">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      id="remember"
+                    />
+
+                    <label
+                      className="form-check-label"
+                      htmlFor="remember"
+                    >
+                      Remember me
+                    </label>
+                  </div>
+
+                  <Link
+                    to="#"
+                    className="text-decoration-none"
+                  >
+                    Forgot Password?
+                  </Link>
+                </div>
+
+                <button
+                  type="submit"
+                  className="btn btn-primary w-100"
+                >
+                  Login
+                </button>
+
+                <div className="text-center my-3 text-muted">
+                  OR
+                </div>
+
+                <button
+                  type="button"
+                  className="btn btn-outline-dark w-100"
+                >
+                  Login with Google
+                </button>
+
+                <p className="text-center mt-4 mb-0">
+                  Don't have an account?{" "}
+                  <Link
+                    to="/register"
+                    className="text-decoration-none"
+                  >
+                    Register
+                  </Link>
+                </p>
+              </form>
             </div>
+          </div>
+
         </div>
-    )
+      </div>
+    </div>
+  );
 }
+
 export default Login;

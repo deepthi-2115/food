@@ -98,11 +98,44 @@ app.post("/api/login", async (req, res) => {
     } catch (error) {
         console.log(error);
 
+
         res.status(500).json({
             message: "Login Failed",
             error: error.message
         });
     }
+});
+
+app.put("/api/change-password", authMiddleware, async (req, res) => {
+  try {
+    const { newPassword } = req.body;
+
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(
+      newPassword,
+      10
+    );
+
+    user.password = hashedPassword;
+
+    await user.save();
+
+    res.status(200).json({
+      message: "Password Changed Successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to Change Password",
+      error: error.message,
+    });
+  }
 });
 
 app.post("/api/items", async (req, res) => {

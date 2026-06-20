@@ -1,10 +1,22 @@
 import { useState, useEffect } from "react";
 
 function Profile() {
-  const [showPasswordFields, setShowPasswordFields] = useState(false);
+  const [showPasswordFields, setShowPasswordFields] =
+    useState(false);
+
   const [user, setUser] = useState({});
+
   const [newPassword, setNewPassword] = useState("");
-const [confirmPassword, setConfirmPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] =
+    useState("");
+
+  const [showNewPassword, setShowNewPassword] =
+    useState(false);
+
+  const [
+    showConfirmPassword,
+    setShowConfirmPassword,
+  ] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -30,13 +42,57 @@ const [confirmPassword, setConfirmPassword] = useState("");
     fetchProfile();
   }, []);
 
- return (
-  <div className="container-fluid p-4">
-    <div className="row justify-content-center">
-      <div className="col-lg-8 col-xl-7">
-        <div className="card shadow border-0">
-          <div className="card-body p-4">
+  const handleChangePassword = async () => {
+    if (!newPassword || !confirmPassword) {
+      alert("Please fill all fields");
+      return;
+    }
 
+    if (newPassword !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await fetch(
+        "http://localhost:5000/api/change-password",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            newPassword,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert(data.message);
+
+        setNewPassword("");
+        setConfirmPassword("");
+        setShowPasswordFields(false);
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      alert("Failed to update password");
+    }
+  };
+
+  return (
+    <div className="container-fluid p-4">
+      <div className="row justify-content-center">
+        <div className="col-lg-8 col-xl-7">
+          <div className="card shadow border-0">
+            <div className="card-body p-4">
               <div className="text-center mb-4">
                 <img
                   src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
@@ -45,6 +101,7 @@ const [confirmPassword, setConfirmPassword] = useState("");
                   width="100"
                   height="100"
                 />
+
                 <h3 className="mt-2 text-success fw-bold">
                   My Profile
                 </h3>
@@ -55,6 +112,7 @@ const [confirmPassword, setConfirmPassword] = useState("");
                   <label className="form-label fw-semibold">
                     Name
                   </label>
+
                   <input
                     type="text"
                     className="form-control"
@@ -67,6 +125,7 @@ const [confirmPassword, setConfirmPassword] = useState("");
                   <label className="form-label fw-semibold">
                     Email
                   </label>
+
                   <input
                     type="email"
                     className="form-control"
@@ -79,6 +138,7 @@ const [confirmPassword, setConfirmPassword] = useState("");
                   <label className="form-label fw-semibold">
                     User ID
                   </label>
+
                   <input
                     type="text"
                     className="form-control"
@@ -91,12 +151,15 @@ const [confirmPassword, setConfirmPassword] = useState("");
                   <label className="form-label fw-semibold">
                     Joined On
                   </label>
+
                   <input
                     type="text"
                     className="form-control"
                     value={
                       user.createdAt
-                        ? new Date(user.createdAt).toLocaleDateString()
+                        ? new Date(
+                            user.createdAt
+                          ).toLocaleDateString()
                         : ""
                     }
                     readOnly
@@ -117,42 +180,117 @@ const [confirmPassword, setConfirmPassword] = useState("");
                       <label className="form-label fw-semibold">
                         New Password
                       </label>
-                      <input
-                        type="password"
-                        className="form-control"
-                        placeholder="Enter password"
-                      />
+
+                      <div className="input-group">
+                        <input
+                          type={
+                            showNewPassword
+                              ? "text"
+                              : "password"
+                          }
+                          className="form-control"
+                          placeholder="Enter New Password"
+                          value={newPassword}
+                          onChange={(e) =>
+                            setNewPassword(
+                              e.target.value
+                            )
+                          }
+                        />
+
+                        <button
+                          type="button"
+                          className="btn btn-outline-secondary"
+                          onClick={() =>
+                            setShowNewPassword(
+                              !showNewPassword
+                            )
+                          }
+                        >
+                          {showNewPassword
+                            ? "Hide"
+                            : "Show"}
+                        </button>
+                      </div>
                     </div>
 
                     <div className="col-md-6 mb-3">
                       <label className="form-label fw-semibold">
                         Confirm Password
                       </label>
-                      <input
-                        type="password"
-                        className="form-control"
-                        placeholder="Confirm password"
-                      />
+
+                      <div className="input-group">
+                        <input
+                          type={
+                            showConfirmPassword
+                              ? "text"
+                              : "password"
+                          }
+                          className="form-control"
+                          placeholder="Confirm New Password"
+                          value={confirmPassword}
+                          onChange={(e) =>
+                            setConfirmPassword(
+                              e.target.value
+                            )
+                          }
+                        />
+
+                        <button
+                          type="button"
+                          className="btn btn-outline-secondary"
+                          onClick={() =>
+                            setShowConfirmPassword(
+                              !showConfirmPassword
+                            )
+                          }
+                        >
+                          {showConfirmPassword
+                            ? "Hide"
+                            : "Show"}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </>
               )}
 
-              <div className="text-center mt-3">
-               
+              <div className="d-flex justify-content-center gap-3 mt-3">
+                {showPasswordFields && (
+                  <button
+                    type="button"
+                    className="btn btn-success px-4"
+                    onClick={
+                      handleChangePassword
+                    }
+                  >
+                    Update Password
+                  </button>
+                )}
 
                 <button
-                  className="btn btn-primary"
-                  onClick={() =>
-                    setShowPasswordFields(!showPasswordFields)
-                  }
+                  type="button"
+                  className={`btn ${
+                    showPasswordFields
+                      ? "btn-secondary"
+                      : "btn-primary"
+                  }`}
+                  onClick={() => {
+                    setShowPasswordFields(
+                      !showPasswordFields
+                    );
+
+                    if (showPasswordFields) {
+                      setNewPassword("");
+                      setConfirmPassword("");
+                    }
+                  }}
                 >
                   {showPasswordFields
                     ? "Cancel"
                     : "Change Password"}
                 </button>
               </div>
-
             </div>
           </div>
         </div>

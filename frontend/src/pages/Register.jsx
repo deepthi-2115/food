@@ -1,86 +1,246 @@
-import {useState} from "react";
-import {Link} from "react-router-dom"
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
-function Register(){
-    const [fullname,setFullname]=useState("");
-    const [email,setEmail]=useState("");
-    const [password,setPassword]=useState("");
-    const [confirmPassword,setConfirmPassword]=useState("");
-    const handleRegister=async (e)=>{
-        e.preventDefault();
-        const userData={
-                fullname:fullname,
-                email:email,
-                password:password,
-                confirmPassword:confirmPassword
-        };
-        if(password!==confirmPassword){
-            alert("Passwords do not match");
-            return;
+
+function Register() {
+  const [fullname, setFullname] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] =
+    useState("");
+
+  const [showPassword, setShowPassword] =
+    useState(false);
+
+  const [
+    showConfirmPassword,
+    setShowConfirmPassword,
+  ] = useState(false);
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+
+    if (password !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/register",
+        {
+          fullname,
+          email,
+          password,
+          confirmPassword,
         }
-        try{
-            const response= await axios.post(
-                "http://localhost:5000/api/register",
-                 userData
-            );
-            alert(response.data.message);
-            setFullname("");
-            setEmail("");
-            setPassword("");
-            setConfirmPassword("");
-        }catch(error){
-            alert(error.response.data.message);
-        }
-    };
-    return(
-        <div>
-               <div className="container mt-5 bg-light p-8" style={{height:"85vh"}}>
-                <div className="row" style={{height:"85vh"}}>
-                    <div className="col-md-6 rounded mt-5" style={{height:"85vh"}}>
-                        <h2 className="fw-bold">Create Account</h2>
-                           <form onSubmit={handleRegister}>
-                                <div className="mb-3">
-                                    <label className="form-label">Full Name</label><br/>
-                                    <input type="text" className="form-control" placeholder="Enter Your Name" value={fullname} onChange={(e)=>setFullname(e.target.value)}></input>
-                                </div>
-                                <div className="mb-3">
-                                <label className="form-label">Email Name</label><br/>
-                                <input type="email" className="form-control" placeholder="Enter Your Email" value={email} onChange={(e)=>setEmail(e.target.value)}></input>
-                                </div>
+      );
 
-                                  <div className="mb-3">
-                                <label className="form-label">Password</label><br/>
-                                <input type="password" className="form-control" placeholder="Enter Your Password" value={password} onChange={(e)=>setPassword(e.target.value)}></input>
-                                </div>
+      alert(response.data.message);
 
-                                 <div className="mb-3">
-                                <label className="form-label">Confirm Password</label><br/>
-                                <input type="password" className="form-control" placeholder="Re-Enter Your Password" value={confirmPassword} onChange={(e)=>setConfirmPassword(e.target.value)}></input>
-                                </div>
+      setFullname("");
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
+    } catch (error) {
+      alert(error.response?.data?.message);
+    }
+  };
 
-                                <div className="form-check">
-                                    <input className="form-check-input" type="checkbox" id="check1"/>
-                                    <label className="form-check-label" htmlFor="check1">
-                                        I agree to the{" "}<span className="text-primary">Terms of Service</span>{" "} and {" "}<span className="text-primary">Privacy Policy</span></label>
-                                    </div>
+  return (
+    <div
+      className="container-fluid d-flex align-items-center justify-content-center"
+      style={{
+        minHeight: "100vh",
+        backgroundColor: "#f8f9fa",
+      }}
+    >
+      <div
+        className="card shadow border-0 w-100"
+        style={{ maxWidth: "1000px" }}
+      >
+        <div className="row g-0 flex-lg-row-reverse">
+          
+          <div className="col-lg-6 d-none d-lg-flex align-items-center justify-content-center bg-light">
+            <img
+              src="src/assets/Register.png"
+              alt="Register"
+              className="img-fluid p-4"
+              style={{ maxHeight: "450px" }}
+            />
+          </div>
 
-                                <button type="submit" className="btn btn-primary text-white w-100 mt-3">Register</button>
-                                <div className="text-secondary mt-2 text-center">Already have an account?{" "} <Link to="/login">Login</Link></div>
-                           </form>
-                    </div>
-                    <div className="col-md-6 p-2 rounded" >
-                        <img src="src/assets/Register.png" className="w-100 h-75 object-fit-cover"></img>
-                    </div>
+          <div className="col-lg-6 col-12">
+            <div className="p-4 p-md-5">
+              <h2 className="fw-bold mb-2">
+                Create Account
+              </h2>
+
+              <p className="text-muted mb-4">
+                Create your account to continue
+              </p>
+
+              <form onSubmit={handleRegister}>
+                <div className="mb-3">
+                  <label className="form-label">
+                    Full Name
+                  </label>
+
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Enter your name"
+                    value={fullname}
+                    onChange={(e) =>
+                      setFullname(e.target.value)
+                    }
+                    required
+                  />
                 </div>
-               </div>
-              </div>
-            
-    )
-       
+
+                <div className="mb-3">
+                  <label className="form-label">
+                    Email
+                  </label>
+
+                  <input
+                    type="email"
+                    className="form-control"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) =>
+                      setEmail(e.target.value)
+                    }
+                    required
+                  />
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label">
+                    Password
+                  </label>
+
+                  <div className="input-group">
+                    <input
+                      type={
+                        showPassword
+                          ? "text"
+                          : "password"
+                      }
+                      className="form-control"
+                      placeholder="Enter password"
+                      value={password}
+                      onChange={(e) =>
+                        setPassword(
+                          e.target.value
+                        )
+                      }
+                      required
+                    />
+
+                    <button
+                      type="button"
+                      className="btn btn-outline-secondary"
+                      onClick={() =>
+                        setShowPassword(
+                          !showPassword
+                        )
+                      }
+                    >
+                      {showPassword
+                        ? "Hide"
+                        : "Show"}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label">
+                    Confirm Password
+                  </label>
+                  
+
+                  <div className="input-group">
+                    <input
+                      type={
+                        showConfirmPassword
+                          ? "text"
+                          : "password"
+                      }
+                      className="form-control"
+                      placeholder="Confirm password"
+                      value={confirmPassword}
+                      onChange={(e) =>
+                        setConfirmPassword(
+                          e.target.value
+                        )
+                      }
+                      required
+                    />
+
+                    <button
+                      type="button"
+                      className="btn btn-outline-secondary"
+                      onClick={() =>
+                        setShowConfirmPassword(
+                          !showConfirmPassword
+                        )
+                      }
+                    >
+                      {showConfirmPassword
+                        ? "Hide"
+                        : "Show"}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="form-check mb-4">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id="terms"
+                    required
+                  />
+
+                  <label
+                    className="form-check-label"
+                    htmlFor="terms"
+                  >
+                    I agree to the{" "}
+                    <span className="text-primary">
+                      Terms of Service
+                    </span>{" "}
+                    and{" "}
+                    <span className="text-primary">
+                      Privacy Policy
+                    </span>
+                  </label>
+                </div>
+
+                <button
+                  type="submit"
+                  className="btn btn-primary w-100"
+                >
+                  Register
+                </button>
+
+                <p className="text-center mt-4 mb-0">
+                  Already have an account?{" "}
+                  <Link
+                    to="/login"
+                    className="text-decoration-none"
+                  >
+                    Login
+                  </Link>
+                </p>
+              </form>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
 }
+
 export default Register;
-
-
-
-
- 

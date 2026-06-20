@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import {Link} from "react-router-dom";
 
 function Home() {
   const [foods, setFoods] = useState([]);
@@ -63,10 +64,9 @@ function Home() {
             Track your food items, monitor expiry dates,
             and reduce food waste with ease.
           </p>
-
-          <button className="btn btn-success px-4">
-            Go to Dashboard
-          </button>
+<Link to="/courses" className="btn btn-success px-4">
+    Food Dashboard
+</Link>
         </div>
 
         <div className="col-md-6 text-center">

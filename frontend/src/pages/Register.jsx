@@ -6,22 +6,23 @@ function Register() {
   const [fullname, setFullname] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] =
-    useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [agree, setAgree] = useState(false);
 
-  const [showPassword, setShowPassword] =
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] =
     useState(false);
-
-  const [
-    showConfirmPassword,
-    setShowConfirmPassword,
-  ] = useState(false);
 
   const handleRegister = async (e) => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
       alert("Passwords do not match");
+      return;
+    }
+
+    if (!agree) {
+      alert("Please agree to the Terms & Conditions");
       return;
     }
 
@@ -42,8 +43,12 @@ function Register() {
       setEmail("");
       setPassword("");
       setConfirmPassword("");
+      setAgree(false);
     } catch (error) {
-      alert(error.response?.data?.message);
+      alert(
+        error.response?.data?.message ||
+          "Registration failed"
+      );
     }
   };
 
@@ -131,9 +136,7 @@ function Register() {
                       placeholder="Enter password"
                       value={password}
                       onChange={(e) =>
-                        setPassword(
-                          e.target.value
-                        )
+                        setPassword(e.target.value)
                       }
                       required
                     />
@@ -158,7 +161,6 @@ function Register() {
                   <label className="form-label">
                     Confirm Password
                   </label>
-                  
 
                   <div className="input-group">
                     <input
@@ -199,7 +201,10 @@ function Register() {
                     className="form-check-input"
                     type="checkbox"
                     id="terms"
-                    required
+                    checked={agree}
+                    onChange={(e) =>
+                      setAgree(e.target.checked)
+                    }
                   />
 
                   <label
@@ -207,11 +212,11 @@ function Register() {
                     htmlFor="terms"
                   >
                     I agree to the{" "}
-                    <span className="text-primary">
-                      Terms of Service
+                    <span className="text-primary fw-semibold">
+                      Terms & Conditions
                     </span>{" "}
                     and{" "}
-                    <span className="text-primary">
+                    <span className="text-primary fw-semibold">
                       Privacy Policy
                     </span>
                   </label>
@@ -220,6 +225,7 @@ function Register() {
                 <button
                   type="submit"
                   className="btn btn-primary w-100"
+                  disabled={!agree}
                 >
                   Register
                 </button>

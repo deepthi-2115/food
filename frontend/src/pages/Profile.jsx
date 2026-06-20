@@ -17,7 +17,8 @@ function Profile() {
     showConfirmPassword,
     setShowConfirmPassword,
   ] = useState(false);
-
+ const [fullname, setFullname] = useState("");
+const [editProfile, setEditProfile] = useState(false);
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -33,7 +34,8 @@ function Profile() {
         );
 
         const data = await response.json();
-        setUser(data);
+setUser(data);
+setFullname(data.fullname || "");
       } catch (error) {
         console.log(error);
       }
@@ -86,6 +88,48 @@ function Profile() {
       alert("Failed to update password");
     }
   };
+  const handleUpdateProfile = async () => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(
+      "http://localhost:5000/api/update-profile",
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          fullname,
+        }),
+      }
+    );
+
+    const data = await response.json();
+if (response.ok) {
+  const updatedUser = {
+    ...user,
+    fullname,
+  };
+
+  setUser(updatedUser);
+
+  localStorage.setItem(
+    "user",
+    JSON.stringify(updatedUser)
+  );
+
+  setEditProfile(false);
+  alert(data.message);
+}else {
+      alert(data.message);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+  
 
   return (
     <div className="container-fluid p-4">
@@ -113,12 +157,13 @@ function Profile() {
                     Name
                   </label>
 
-                  <input
-                    type="text"
-                    className="form-control"
-                    value={user.fullname || ""}
-                    readOnly
-                  />
+                <input
+  type="text"
+  className="form-control"
+  value={fullname}
+  readOnly={!editProfile}
+  onChange={(e) => setFullname(e.target.value)}
+/>
                 </div>
 
                 <div className="col-md-6 mb-3">
@@ -255,42 +300,56 @@ function Profile() {
                 </>
               )}
 
-              <div className="d-flex justify-content-center gap-3 mt-3">
-                {showPasswordFields && (
-                  <button
-                    type="button"
-                    className="btn btn-success px-4"
-                    onClick={
-                      handleChangePassword
-                    }
-                  >
-                    Update Password
-                  </button>
-                )}
+             <div className="d-flex justify-content-center gap-3 mt-3">
 
-                <button
-                  type="button"
-                  className={`btn ${
-                    showPasswordFields
-                      ? "btn-secondary"
-                      : "btn-primary"
-                  }`}
-                  onClick={() => {
-                    setShowPasswordFields(
-                      !showPasswordFields
-                    );
+  <button
+    type="button"
+    className={`btn ${
+      editProfile ? "btn-success" : "btn-warning"
+    }`}
+    onClick={() => {
+      if (editProfile) {
+        handleUpdateProfile();
+      } else {
+        setEditProfile(true);
+      }
+    }}
+  >
+    {editProfile ? "Save Profile" : "Edit Profile"}
+  </button>
 
-                    if (showPasswordFields) {
-                      setNewPassword("");
-                      setConfirmPassword("");
-                    }
-                  }}
-                >
-                  {showPasswordFields
-                    ? "Cancel"
-                    : "Change Password"}
-                </button>
-              </div>
+  {showPasswordFields && (
+    <button
+      type="button"
+      className="btn btn-success px-4"
+      onClick={handleChangePassword}
+    >
+      Update Password
+    </button>
+  )}
+
+  <button
+    type="button"
+    className={`btn ${
+      showPasswordFields
+        ? "btn-secondary"
+        : "btn-primary"
+    }`}
+    onClick={() => {
+      setShowPasswordFields(!showPasswordFields);
+
+      if (showPasswordFields) {
+        setNewPassword("");
+        setConfirmPassword("");
+      }
+    }}
+  >
+    {showPasswordFields
+      ? "Cancel"
+      : "Change Password"}
+  </button>
+
+</div>
             </div>
           </div>
         </div>

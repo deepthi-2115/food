@@ -252,6 +252,33 @@ app.put("/api/change-password", async (req, res) => {
     });
   }
 });
+app.put("/api/update-profile", authMiddleware, async (req, res) => {
+  try {
+    const { fullname } = req.body;
+
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    user.fullname = fullname;
+
+    await user.save();
+
+    res.status(200).json({
+      message: "Profile Updated Successfully",
+      user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to Update Profile",
+      error: error.message,
+    });
+  }
+});
 
 app.listen(process.env.PORT,()=>{
     console.log(`server running on port {PORT}`);

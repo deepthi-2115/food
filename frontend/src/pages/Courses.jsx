@@ -5,7 +5,8 @@ function Courses() {
   const [foods, setFoods] = useState([]);
   const [search, setSearch] = useState("");
   const [editingId, setEditingId] = useState(null);
-
+  const [sortField, setSortField] = useState("");
+const [sortOrder, setSortOrder] = useState("asc");
   const [formData, setFormData] = useState({
     name: "",
     category: "",
@@ -105,15 +106,7 @@ function Courses() {
     (food) => food.quantity === 0
   ).length;
 
-  const filteredFoods = foods.filter(
-    (food) =>
-      food.name
-        .toLowerCase()
-        .includes(search.toLowerCase()) ||
-      food.category
-        .toLowerCase()
-        .includes(search.toLowerCase())
-  );
+  
   const getExpiryStatus = (expiryDate) => {
   const today = new Date();
   const expiry = new Date(expiryDate);
@@ -129,7 +122,39 @@ function Courses() {
   if (diffDays <= 7) return "Expiring Soon";
   return "Fresh";
 };
+const filteredFoods = foods
+  .filter(
+    (food) =>
+      food.name
+        .toLowerCase()
+        .includes(search.toLowerCase()) ||
+      food.category
+        .toLowerCase()
+        .includes(search.toLowerCase())
+  )
+  .sort((a, b) => {
+    if (sortField === "name") {
+      return sortOrder === "asc"
+        ? a.name.localeCompare(b.name)
+        : b.name.localeCompare(a.name);
+    }
 
+    if (sortField === "status") {
+      const order = {
+        Expired: 1,
+        "Expiring Soon": 2,
+        Fresh: 3,
+      };
+
+      return sortOrder === "asc"
+        ? order[getExpiryStatus(a.expiryDate)] -
+            order[getExpiryStatus(b.expiryDate)]
+        : order[getExpiryStatus(b.expiryDate)] -
+            order[getExpiryStatus(a.expiryDate)];
+    }
+
+    return 0;
+  });
 const getExpiryBadge = (expiryDate) => {
   const status = getExpiryStatus(expiryDate);
 
@@ -156,10 +181,19 @@ const getExpiryBadge = (expiryDate) => {
       );
   }
 };
+const handleSort = (field) => {
+  if (sortField === field) {
+    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+  } else {
+    setSortField(field);
+    setSortOrder("asc");
+  }
+};
+
 
   
   return (
-  <div className="container-fluid p-4">
+  <div className="container-fluid p-2 p-md-4">
     <div className="d-flex justify-content-between align-items-center mb-4">
       <h3 className="fw-bold text-primary mb-0">
         Food Inventory
@@ -238,11 +272,11 @@ const getExpiryBadge = (expiryDate) => {
     </div>
 
     <div className="row mb-3">
-      <div className="col-md-4 ms-auto">
+     <div className="col-12 col-md-4 ms-md-auto">
         <input
           type="text"
           className="form-control"
-          placeholder="Search food..."
+          placeholder="🥕🔍Search food..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -255,11 +289,31 @@ const getExpiryBadge = (expiryDate) => {
           <table className="table table-hover align-middle" style={{backgroundColor:"rgb(92, 150, 249)"}}>
             <thead className="table-light" style={{backgroundColor:"rgb(92, 150, 249)"}}>
               <tr>
-                <th>Food Name</th>
+  <th
+  style={{ cursor: "pointer" }}
+  onClick={() => handleSort("name")}
+>
+  Food Name{" "}
+  {sortField === "name"
+    ? sortOrder === "asc"
+      ? "▲"
+      : "▼"
+    : "↕"}
+</th>
                 <th>Category</th>
                 <th>Quantity</th>
                 <th>Expiry Date</th>
-                <th>Status</th>
+              <th
+  style={{ cursor: "pointer" }}
+  onClick={() => handleSort("status")}
+>
+  Status{" "}
+  {sortField === "status"
+    ? sortOrder === "asc"
+      ? "▲"
+      : "▼"
+    : "↕"}
+</th>
                 <th className="text-center">Actions</th>
               </tr>
             </thead>

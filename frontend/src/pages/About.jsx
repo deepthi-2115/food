@@ -4,7 +4,7 @@ function About() {
       <div className="row align-items-center g-3 mb-2">
         <div className="col-lg-5 col-md-6 text-center">
           <img
-            src="https://images.unsplash.com/photo-1542838132-92c53300491e"
+            src="src/assets/about.png"
             alt="Food Management"
             className="img-fluid rounded shadow"
             style={{

@@ -8,11 +8,12 @@ function Home() {
   useEffect(() => {
     fetchFoods();
   }, []);
-
+const API_URL = import.meta.env.VITE_API_URL;
   const fetchFoods = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:5000/api/items"
+    `${API_URL}/api/profile`
+        
       );
       setFoods(res.data);
     } catch (error) {

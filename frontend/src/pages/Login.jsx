@@ -8,7 +8,7 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
-  const API_URL=import meta.env.VITE_API_URL;
+  const API_URL=import.meta.env.VITE_API_URL;
 
   const handleLogin = async (e) => {
     e.preventDefault();
